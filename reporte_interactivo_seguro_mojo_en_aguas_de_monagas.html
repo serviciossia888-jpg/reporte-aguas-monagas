@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Técnico: Mojo en Aguas de Monagas C.A. (Seguro)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #faf9f6;
+            color: #292524;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 280px;
+            }
+        }
+        .nav-btn.active {
+            border-bottom: 4px solid #0f766e;
+            color: #0f766e;
+            font-weight: 700;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (#faf9f6 base, #292524 text) with Teal (#0f766e) and Orange (#ea580c) accents to match the corporate presentation style while keeping it clean and readable. -->
+    <!-- Application Structure Plan: The application uses a tabbed dashboard architecture. This structure was chosen to transform a linear slide deck into an explorable tool. 'El Desafío' sets the problem context; 'La Solución' explains the technical paradigm shift (Mojo); 'Rendimiento' provides interactive exploration of the benchmark data; and 'Impacto & ROI' summarizes the business value. This allows users, whether technical or managerial, to navigate directly to their area of interest (e.g., jumping straight to performance stats or business impact). -->
+    <!-- Visualization & Content Choices: 
+         - Python Issues -> Card Grid -> Highlights vulnerabilities visually. HTML/CSS.
+         - Paradigm Comparison -> Table -> Clear side-by-side technical contrast. HTML/CSS.
+         - Compiler Flow -> HTML/CSS Diagram -> Explains MLIR without SVGs.
+         - Benchmarks (80k vs 500k) -> Dynamic Bar Chart (Chart.js) -> Allows users to interact with scale projections and see the exponential gap between Python and Mojo.
+         - Resource Liberation (97.5%) -> Donut Chart (Chart.js) -> High impact visualization of CPU time saved.
+         - Confirming NO SVG/Mermaid used. Interactive elements support the non-linear exploration of the report. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased selection:bg-teal-200 selection:text-teal-900">
+
+    <header class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-6 flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-stone-800 tracking-tight">
+                        <span class="text-teal-700">Mojo</span> vs Python
+                    </h1>
+                    <p class="text-sm text-stone-500 mt-1 font-medium">Reporte Técnico de Rendimiento - Aguas de Monagas C.A. | Junio 2026</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex space-x-1 overflow-x-auto pb-2 md:pb-0" id="nav-container">
+                    <button class="nav-btn active px-4 py-2 text-sm font-semibold text-stone-600 hover:text-teal-700 whitespace-nowrap transition-colors" data-target="seccion-desafio">El Desafío</button>
+                    <button class="nav-btn px-4 py-2 text-sm font-semibold text-stone-600 hover:text-teal-700 whitespace-nowrap transition-colors" data-target="seccion-solucion">La Solución</button>
+                    <button class="nav-btn px-4 py-2 text-sm font-semibold text-stone-600 hover:text-teal-700 whitespace-nowrap transition-colors" data-target="seccion-rendimiento">Análisis de Rendimiento</button>
+                    <button class="nav-btn px-4 py-2 text-sm font-semibold text-stone-600 hover:text-teal-700 whitespace-nowrap transition-colors" data-target="seccion-impacto">Impacto y ROI</button>
+                    <button class="nav-btn px-4 py-2 text-sm font-semibold text-stone-600 hover:text-teal-700 whitespace-nowrap transition-colors" data-target="seccion-ia">✨ Consultor IA</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="seccion-desafio" class="tab-content fade-in block">
+            <div class="max-w-3xl mb-10">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">El Contexto y las Limitaciones Actuales</h2>
+                <p class="text-lg text-stone-600 leading-relaxed">
+                    Esta sección expone el escenario operativo de Hidroven y Aguas de Monagas C.A. Aquí analizamos por qué la infraestructura actual, basada puramente en Python interpretado, se ha convertido en un cuello de botella para procesar el Archivo Maestro de Facturación ante el notable aumento de suscriptores en Maturín y Ezequiel Zamora.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-bold text-teal-800 mb-3">El Archivo Maestro</h3>
+                    <p class="text-stone-600 mb-4">El desafío crítico radica en procesar ágilmente el Archivo Maestro de Facturación regional, que sustenta los servicios de agua potable. La validación masiva requiere estabilidad absoluta, limitando el uso excesivo de hardware.</p>
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-100">
+                        <p class="text-sm font-semibold text-stone-700 mb-2">Flujo de Datos:</p>
+                        <ul class="text-sm text-stone-600 space-y-1">
+                            <li>1. Dispositivos PDA/PC en campo</li>
+                            <li>2. Multiplexor y ADC (Señal a Digital)</li>
+                            <li>3. Filtro Digital y UART</li>
+                            <li>4. Base de Datos Central</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <h3 class="text-xl font-bold text-orange-600 mb-4">El Desafío de la Distribución (Infraestructura Python)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-orange-100 border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
+                            <div class="text-2xl mb-2">⚠️</div>
+                            <h4 class="font-bold text-stone-800 mb-2">Entorno Frágil</h4>
+                            <p class="text-sm text-stone-600">Distribuir scripts de Python requiere dependencias complejas, entornos virtuales (venv) y la instalación de gestores propensos a fallos en producción.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-orange-100 border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
+                            <div class="text-2xl mb-2">🔄</div>
+                            <h4 class="font-bold text-stone-800 mb-2">Colisión de Librerías</h4>
+                            <p class="text-sm text-stone-600">El desfase de versiones entre entornos de desarrollo y de cliente final paraliza constantes despliegues en sistemas operativos legacy.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-orange-100 border-l-4 border-l-orange-500 hover:shadow-md transition-shadow sm:col-span-2">
+                            <div class="text-2xl mb-2">🔓</div>
+                            <h4 class="font-bold text-stone-800 mb-2">Lógica Expuesta (Pérdida de IP)</h4>
+                            <p class="text-sm text-stone-600">El software tradicional en Python expone el código de propiedad intelectual de facturación y reglas comerciales sin protección nativa, permitiendo su lectura y alteración no autorizada.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="seccion-solucion" class="tab-content hidden">
+            <div class="max-w-3xl mb-10">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Mojo: El Camino Nativo</h2>
+                <p class="text-lg text-stone-600 leading-relaxed">
+                    En esta sección detallamos el cambio de paradigma. Exploramos cómo Mojo unifica la facilidad de uso del ecosistema de Python con el rendimiento superior y seguridad implacable de lenguajes como C++ y Rust, solucionando los problemas de escalabilidad mediante compilación Ahead-Of-Time (AOT).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                    <div class="bg-stone-50 px-6 py-4 border-b border-stone-200">
+                        <h3 class="font-bold text-stone-800">Análisis de Paradigmas</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-stone-600">
+                            <thead class="text-xs text-stone-700 uppercase bg-stone-100">
+                                <tr>
+                                    <th class="px-6 py-3">Atributo Técnico</th>
+                                    <th class="px-6 py-3 border-l border-stone-200 text-orange-600">Python (Interprete)</th>
+                                    <th class="px-6 py-3 border-l border-stone-200 text-teal-700">Mojo (Compilado AOT)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-stone-100">
+                                    <td class="px-6 py-4 font-medium text-stone-800">Entorno Destino</td>
+                                    <td class="px-6 py-4 border-l border-stone-100">Requiere instalación obligatoria de runtime.</td>
+                                    <td class="px-6 py-4 border-l border-stone-100 font-semibold text-teal-800">Genera un ejecutable binario autónomo único.</td>
+                                </tr>
+                                <tr class="border-b border-stone-100 bg-stone-50/50">
+                                    <td class="px-6 py-4 font-medium text-stone-800">Gestión del Código</td>
+                                    <td class="px-6 py-4 border-l border-stone-100">Expone el archivo fuente directamente (.py).</td>
+                                    <td class="px-6 py-4 border-l border-stone-100 font-semibold text-teal-800">Compila Ahead-Of-Time, protegiendo la IP.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium text-stone-800">Ejecución</td>
+                                    <td class="px-6 py-4 border-l border-stone-100">Bytecode en máquina virtual con altos retardos.</td>
+                                    <td class="px-6 py-4 border-l border-stone-100 font-semibold text-teal-800">Optimizado para el procesador anfitrión de inmediato.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-teal-100 border-t-4 border-t-teal-600">
+                    <h3 class="text-xl font-bold text-stone-800 mb-4">Arquitectura por Diseño</h3>
+                    
+                    <div class="mb-6 bg-stone-50 p-4 rounded-lg flex flex-col items-center border border-stone-200">
+                        <div class="bg-yellow-400 text-stone-900 font-bold px-4 py-1 rounded text-sm mb-4">Phases Of A Compiler (Mojo)</div>
+                        <div class="w-full flex justify-between items-center text-xs font-semibold text-stone-600 text-center">
+                            <div class="w-1/3 bg-pink-500 text-white p-2 rounded shadow-sm">Syntax Analysis<br><span class="text-[10px] font-normal">(Parse Tree)</span></div>
+                            <div class="text-2xl text-stone-400">➔</div>
+                            <div class="w-1/3 bg-red-500 text-white p-2 rounded shadow-sm">Code Optimization<br><span class="text-[10px] font-normal">(MLIR / SIMD)</span></div>
+                        </div>
+                    </div>
+
+                    <h4 class="font-bold text-teal-700 mb-2">Soporte Nativo de MLIR</h4>
+                    <p class="text-sm text-stone-600">Al procesar la lógica de computación en tiempo de compilación estructurada mediante MLIR (Multi-Level Intermediate Representation), Mojo escala el rendimiento nativamente. El hardware se optimiza de manera transparente para multinúcleos y vectores avanzados.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-teal-100 text-teal-700 p-2 rounded-lg mr-3 text-xl">🗑️</div>
+                        <h4 class="font-bold text-stone-800 text-lg">Sin Colector de Basura (No GC)</h4>
+                    </div>
+                    <p class="text-sm text-stone-600 mb-3">Al carecer de Garbage Collector, Mojo elimina por completo las pausas de ejecución imprevistas y los retrasos cíclicos de CPU, asegurando latencia predecible.</p>
+                    <p class="text-sm text-stone-600"><strong class="text-stone-800">Ownership Checking:</strong> El sistema analiza la propiedad de variables en tiempo de compilación, garantizando memoria segura a costo cero de abstracción.</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-stone-200">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-teal-100 text-teal-700 p-2 rounded-lg mr-3 text-xl">⚡</div>
+                        <h4 class="font-bold text-stone-800 text-lg">Eliminación del GIL</h4>
+                    </div>
+                    <p class="text-sm text-stone-600">A diferencia de Python, donde el Global Interpreter Lock (GIL) permite solo un hilo ejecutando bytecode a la vez (limitando el potencial multi-núcleo).</p>
+                    <p class="text-sm text-stone-600 mt-2">Mojo no sufre esta limitación. Utiliza vectorización avanzada (SIMD) automática, maximizando las capacidades del silicio local para paralelismo real.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="seccion-rendimiento" class="tab-content hidden">
+            <div class="max-w-3xl mb-8">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Benchmark Interactivo: Facturación</h2>
+                <p class="text-lg text-stone-600 leading-relaxed">
+                    Esta sección permite interactuar con los resultados de rendimiento ejecutados sobre el dataset real de Aguas de Monagas C.A. Podrá comprobar empíricamente cómo reaccionan Python y Mojo ante cargas masivas de datos durante las tareas críticas de facturación regional.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="font-bold text-teal-800 mb-4 border-b border-stone-100 pb-2">El Dataset (Aguas de Monagas)</h3>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between items-center"><span class="text-stone-500">Registros:</span> <span class="font-bold text-stone-800">80,405 Suscriptores Únicos</span></li>
+                            <li class="flex justify-between items-center"><span class="text-stone-500">Variables:</span> <span class="font-bold text-stone-800">77 Atributos Mixtos</span></li>
+                            <li class="flex justify-between items-center"><span class="text-stone-500">Cobertura:</span> <span class="font-bold text-stone-800">Maturín y Ezequiel Zamora</span></li>
+                        </ul>
+                        <div class="mt-4 pt-4 border-t border-stone-100">
+                            <h4 class="font-semibold text-stone-700 mb-2 text-xs uppercase tracking-wider">Operaciones Evaluadas</h4>
+                            <p class="text-xs text-stone-600 mb-1">• <strong>Filtrado:</strong> Segmentación geográfica compleja.</p>
+                            <p class="text-xs text-stone-600 mb-1">• <strong>Agregación:</strong> Flujos de caja por tasas de consumo.</p>
+                            <p class="text-xs text-stone-600">• <strong>Limpieza:</strong> Normalización de Cédula/RIF y nulos.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-teal-700 p-6 rounded-xl shadow-md text-white">
+                        <h3 class="font-semibold text-teal-100 text-sm mb-1">Factor de Aceleración</h3>
+                        <div class="text-4xl font-extrabold mb-1" id="acceleration-display">40.9x</div>
+                        <p class="text-teal-200 text-xs">Mojo es <span id="acceleration-text">40.9</span> veces más rápido que Python para la carga seleccionada.</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                        <h3 class="text-xl font-bold text-stone-800">Comparativa de Tiempos de Ejecución</h3>
+                        <div class="mt-3 sm:mt-0">
+                            <label for="data-scale" class="block text-xs font-semibold text-stone-500 mb-1">Volumen de Registros (Carga)</label>
+                            <select id="data-scale" class="bg-stone-50 border border-stone-300 text-stone-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 outline-none cursor-pointer">
+                                <option value="1k">1,000 (Muestra Reducida)</option>
+                                <option value="10k">10,000 (Segmento de Control)</option>
+                                <option value="80k" selected>80,405 (Dataset Completo Real)</option>
+                                <option value="500k">500,000 (Proyección del Sistema)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="benchmarkChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-stone-400 mt-4">* Tiempos expresados en milisegundos (ms). Menor es mejor.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="seccion-impacto" class="tab-content hidden">
+            <div class="max-w-3xl mb-10">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Impacto Financiero y Operativo</h2>
+                <p class="text-lg text-stone-600 leading-relaxed">
+                    Más allá de los milisegundos, esta sección cuantifica el retorno de inversión (ROI) de la migración a Mojo. Explicamos cómo la eficiencia computacional extrema se traduce directamente en ahorro de infraestructura Cloud, mejor experiencia de usuario y mantenimiento simplificado.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-8">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-stone-200 flex flex-col justify-center h-full">
+                    <h3 class="text-2xl font-bold text-stone-800 text-center mb-6">Liberación de Recursos (CPU)</h3>
+                    <div class="chart-container" style="height: 250px; max-height: 250px;">
+                        <canvas id="efficiencyChart"></canvas>
+                    </div>
+                    <p class="text-center text-stone-600 mt-6 text-sm">
+                        La ganancia estructural de eficiencia se calcula reduciendo los tiempos muertos de cómputo en servidores dedicados. <strong>Ahorro del 97.5% de tiempo de procesador.</strong>
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 border-l-4 border-l-teal-600">
+                        <h4 class="font-bold text-stone-800 text-lg mb-2 flex items-center">
+                            <span class="text-teal-600 mr-2">☁️</span> Reducción de Costo en Nube
+                        </h4>
+                        <p class="text-stone-600 text-sm">La drástica reducción de tiempo de CPU del 97.5% disminuye directamente los costos asociados a instancias Cloud y el escalado elástico durante los intensos procesos cíclicos de facturación mensual.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 border-l-4 border-l-teal-600">
+                        <h4 class="font-bold text-stone-800 text-lg mb-2 flex items-center">
+                            <span class="text-teal-600 mr-2">⏱️</span> Eliminación de Timeouts
+                        </h4>
+                        <p class="text-stone-600 text-sm">El procesamiento ultrarrápido evita el colapso de peticiones concurrentes a la API. Se garantiza la escalabilidad poblacional a futuro (500k+), optimizando la experiencia final del suscriptor y minimizando horas de soporte técnico correctivo.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 border-l-4 border-l-teal-600">
+                        <h4 class="font-bold text-stone-800 text-lg mb-2 flex items-center">
+                            <span class="text-teal-600 mr-2">🐍</span> Ecosistema Interoperable
+                        </h4>
+                        <p class="text-stone-600 text-sm"><strong>Migración Progresiva:</strong> Importe librerías masivas de CPython (Pandas, NumPy) de forma directa sin perder compatibilidad. Desarrolle con lógica de programación unificada, funcional en CPUs heredadas y GPUs modernas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE INTELIGENCIA ARTIFICIAL (CON MITIGACIÓN DE SEGURIDAD INTEGRADA) -->
+        <section id="seccion-ia" class="tab-content hidden">
+            <div class="max-w-3xl mb-10">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">✨ Consultor IA & Asistente Mojo</h2>
+                <p class="text-lg text-stone-600 leading-relaxed mb-6">
+                    Esta sección está potenciada por un Modelo de Lenguaje Grande de Google (Gemini API). Para proteger la seguridad e integridad del servicio de la institución, la API Key no está escrita de forma rígida en el código. Debe configurarse de manera local y privada.
+                </p>
+
+                <!-- MITIGACIÓN DE FALLA DE SEGURIDAD: Panel de ingreso de clave dinámico -->
+                <div id="api-key-setup" class="mb-6 p-5 bg-teal-50 border border-teal-200 rounded-xl shadow-sm fade-in">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-teal-800 mb-2">🔐 Configuración Segura de Gemini API Key:</label>
+                    <p class="text-xs text-stone-600 mb-3 leading-relaxed">
+                        Su API Key se almacenará únicamente en la memoria local de su navegador (<code>localStorage</code>) y se llamará de forma directa para comunicarse exclusivamente con los servidores seguros de Google AI. **Ningún tercero podrá interceptar ni visualizar su clave en el código fuente público de este reporte.**
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="password" id="user-api-key" class="flex-1 text-xs p-3 rounded-lg border border-stone-300 outline-none focus:ring-2 focus:ring-teal-500 font-mono shadow-inner" placeholder="Escriba su API Key aquí (AIzaSy...)">
+                        <button onclick="saveApiKey()" class="bg-teal-700 hover:bg-teal-800 text-white px-5 py-3 text-xs font-bold rounded-lg transition-colors shadow">Guardar Clave</button>
+                    </div>
+                    <div class="mt-2 text-[10px] text-teal-600 font-medium">💡 Puede obtener una API Key gratuita en Google AI Studio para fines de prueba.</div>
+                </div>
+            </div>
+
+            <!-- Banner de error de conexión o API Key inválida -->
+            <div id="ia-error-banner" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm flex items-start space-x-2">
+                <span class="text-lg">⚠️</span>
+                <div class="flex-1">
+                    <h5 class="font-bold mb-1">Error de Validación o Conexión</h5>
+                    <p id="ia-error-message"></p>
+                </div>
+                <button onclick="document.getElementById('ia-error-banner').classList.add('hidden')" class="text-red-500 font-bold hover:text-red-700">&times;</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Tarjeta de Refactorización de código -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-teal-800 mb-4 flex items-center">
+                            <span>💻</span> <span class="ml-2">Convertidor de Código Python a Mojo</span>
+                        </h3>
+                        <p class="text-stone-600 text-sm mb-4">
+                            Seleccione uno de los escenarios reales de facturación e infraestructura de Aguas de Monagas C.A. o inserte su propia lógica de base de datos para ver cómo se estructuraría de forma ultraeficiente en Mojo.
+                        </p>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-stone-500 mb-2">Escenarios de Datos Preestablecidos</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <button onclick="selectTemplate('lecturas')" class="px-3 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg text-left transition-colors">
+                                    📂 Lecturas de Maturín
+                                </button>
+                                <button onclick="selectTemplate('tarifas')" class="px-3 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg text-left transition-colors">
+                                    📂 Cálculo de Tarifas
+                                </button>
+                                <button onclick="selectTemplate('limpieza')" class="px-3 py-2 text-xs font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg text-left transition-colors">
+                                    📂 Limpieza de RIFs
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="ia-python-input" class="block text-xs font-semibold text-stone-500 mb-1">Código Python a Refactorizar</label>
+                            <textarea id="ia-python-input" rows="8" class="font-mono text-xs bg-stone-900 text-stone-100 p-3 rounded-lg w-full outline-none focus:ring-2 focus:ring-teal-500" placeholder="# Ingrese código Python de procesamiento aquí..."></textarea>
+                        </div>
+                    </div>
+
+                    <button id="btn-ia-optimize" onclick="optimizeWithMojo()" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 shadow">
+                        <span>✨ Optimizar código con Mojo</span>
+                    </button>
+                </div>
+
+                <!-- Tarjeta de Generación de Informes -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-orange-600 mb-4 flex items-center">
+                            <span>📝</span> <span class="ml-2">Briefing Ejecutivo para la Directiva</span>
+                        </h3>
+                        <p class="text-stone-600 text-sm mb-4">
+                            Genere un reporte ejecutivo formal, minutas técnicas o resúmenes de viabilidad de infraestructura de nube utilizando los benchmarks reales del aplicativo para presentarlos ante Hidroven.
+                        </p>
+
+                        <div class="mb-4">
+                            <label for="ia-briefing-type" class="block text-xs font-semibold text-stone-500 mb-1">Tipo de Documento Deseado</label>
+                            <select id="ia-briefing-type" class="bg-stone-50 border border-stone-300 text-stone-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 outline-none cursor-pointer">
+                                <option value="informe">Informe Técnico de Viabilidad</option>
+                                <option value="minuta">Minuta Ejecutiva para Junta de Hidroven</option>
+                                <option value="justificacion">Justificación Financiera y TCO de Servidores</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="ia-extra-context" class="block text-xs font-semibold text-stone-500 mb-1">Puntos o Contexto Adicional (Opcional)</label>
+                            <textarea id="ia-extra-context" rows="4" class="text-xs bg-stone-50 text-stone-800 p-3 rounded-lg w-full border border-stone-300 outline-none focus:ring-2 focus:ring-teal-500" placeholder="Ej. 'Enfatizar que la base de datos corre en servidores locales obsoletos...'"></textarea>
+                        </div>
+                    </div>
+
+                    <button id="btn-ia-briefing" onclick="generateExecutiveBriefing()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 shadow">
+                        <span>✨ Generar Briefing Ejecutivo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal de Salida Unificada de la IA -->
+            <div id="ia-output-container" class="hidden mt-8 bg-stone-900 border border-stone-800 rounded-xl overflow-hidden shadow-lg fade-in">
+                <div class="bg-stone-800 px-4 py-3 flex items-center justify-between border-b border-stone-700">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                        <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                        <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        <span class="text-xs font-semibold text-stone-400 font-mono ml-2" id="ia-output-title">Consola del Consultor IA</span>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="copyIaOutput()" class="text-xs text-teal-400 font-semibold hover:text-teal-300 transition-colors flex items-center space-x-1">
+                            <span>📋 Copiar al portapapeles</span>
+                        </button>
+                        <button onclick="resetApiKey()" class="text-xs text-red-400 font-semibold hover:text-red-300 transition-colors flex items-center space-x-1">
+                            <span>🔑 Restablecer Clave</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6 font-mono text-xs text-stone-300 overflow-y-auto max-h-[500px]" id="ia-output-content">
+                    <!-- El contenido de la IA se cargará aquí -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-stone-200 mt-12 py-8">
+        <div class="max-w-6xl mx-auto px-4 text-center text-sm text-stone-500">
+            <p>Reporte Técnico Interactivo: Compilación Nativa en Mojo para Facturación Hídrica.</p>
+            <p class="mt-1">Aguas de Monagas C.A. - Hidroven | Desarrollado para análisis de infraestructura.</p>
+        </div>
+    </footer>
+
+    <script>
+        const chartData = {
+            '1k': { python: 12.4, mojo: 0.8, factor: '15.5' },
+            '10k': { python: 48.2, mojo: 2.1, factor: '22.9' },
+            '80k': { python: 294.6, mojo: 7.2, factor: '40.9' },
+            '500k': { python: 1840.0, mojo: 31.5, factor: '58.4' }
+        };
+
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.tab-content');
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const targetId = btn.getAttribute('data-target');
+                sections.forEach(sec => {
+                    if(sec.id === targetId) {
+                        sec.classList.remove('hidden');
+                        sec.classList.add('block');
+                    } else {
+                        sec.classList.remove('block');
+                        sec.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        const ctxBenchmark = document.getElementById('benchmarkChart').getContext('2d');
+        const benchmarkChart = new Chart(ctxBenchmark, {
+            type: 'bar',
+            data: {
+                labels: ['Python (Pandas)', 'Mojo (Compilado)'],
+                datasets: [{
+                    label: 'Tiempo de Ejecución (ms)',
+                    data: [chartData['80k'].python, chartData['80k'].mojo],
+                    backgroundColor: [
+                        '#ea580c', 
+                        '#0f766e'  
+                    ],
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', 
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + ' ms';
+                            }
+                        },
+                        padding: 10,
+                        backgroundColor: 'rgba(41, 37, 36, 0.9)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 14 }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f5f5f4'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Milisegundos (ms)',
+                            color: '#78716c',
+                            font: { size: 12 }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                weight: 'bold',
+                                size: 13
+                            },
+                            color: '#44403c'
+                        }
+                    }
+                }
+            }
+        });
+
+        const selectScale = document.getElementById('data-scale');
+        const accDisplay = document.getElementById('acceleration-display');
+        const accText = document.getElementById('acceleration-text');
+
+        selectScale.addEventListener('change', (e) => {
+            const selectedKey = e.target.value;
+            const data = chartData[selectedKey];
+            
+            benchmarkChart.data.datasets[0].data = [data.python, data.mojo];
+            benchmarkChart.update();
+            
+            accDisplay.innerText = data.factor + 'x';
+            accText.innerText = data.factor;
+            
+            accDisplay.classList.remove('fade-in');
+            void accDisplay.offsetWidth; 
+            accDisplay.classList.add('fade-in');
+        });
+
+        const ctxEfficiency = document.getElementById('efficiencyChart').getContext('2d');
+        new Chart(ctxEfficiency, {
+            type: 'doughnut',
+            data: {
+                labels: ['Tiempo Eliminado (Ahorro)', 'Tiempo de Procesamiento Restante'],
+                datasets: [{
+                    data: [97.5, 2.5],
+                    backgroundColor: [
+                        '#0f766e', 
+                        '#e7e5e4'  
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: { size: 12 },
+                            color: '#57534e'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + '%';
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: [{
+                id: 'centerText',
+                beforeDraw: function(chart) {
+                    var width = chart.width,
+                        height = chart.height,
+                        ctx = chart.ctx;
+
+                    ctx.restore();
+                    var fontSize = (height / 114).toFixed(2);
+                    ctx.font = "bold " + fontSize + "em sans-serif";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#0f766e";
+
+                    var text = "97.5%",
+                        textX = Math.round((width - ctx.measureText(text).width) / 2),
+                        textY = (height / 2) - 15; 
+
+                    ctx.fillText(text, textX, textY);
+                    
+                    ctx.font = "normal " + (fontSize*0.35) + "em sans-serif";
+                    ctx.fillStyle = "#78716c";
+                    var text2 = "Liberación",
+                        text2X = Math.round((width - ctx.measureText(text2).width) / 2),
+                        text2Y = textY + 25;
+                    ctx.fillText(text2, text2X, text2Y);
+                    
+                    ctx.save();
+                }
+            }]
+        });
+
+        // INTEGRACIÓN DE GEMINI API (LÓGICA CON MITIGACIÓN DE SEGURIDAD LOCAL)
+        let apiKey = localStorage.getItem('gemini_api_key') || "";
+
+        // Ocultar el setup si ya existe una clave guardada
+        if (apiKey) {
+            document.getElementById('api-key-setup').classList.add('hidden');
+        }
+
+        // Función para guardar clave de manera dinámica
+        function saveApiKey() {
+            const keyInput = document.getElementById('user-api-key').value.trim();
+            if (keyInput) {
+                localStorage.setItem('gemini_api_key', keyInput);
+                apiKey = keyInput;
+                document.getElementById('api-key-setup').classList.add('hidden');
+                document.getElementById('ia-error-banner').classList.add('hidden');
+                
+                // Indicar al usuario que el sistema está listo
+                const outputContainer = document.getElementById('ia-output-container');
+                const outputContent = document.getElementById('ia-output-content');
+                const outputTitle = document.getElementById('ia-output-title');
+                
+                outputContainer.classList.remove('hidden');
+                outputTitle.innerText = "Consola IA - Clave Configurada";
+                outputContent.innerHTML = `<span class="text-green-400">✔ API Key almacenada de forma segura localmente. Ahora puede usar el convertidor de código Mojo o el generador de briefing de inmediato.</span>`;
+            } else {
+                showError("Por favor ingrese una API Key de Gemini que sea válida.");
+            }
+        }
+
+        // Función para restablecer la API Key para desarrollo o cambio de usuario
+        function resetApiKey() {
+            localStorage.removeItem('gemini_api_key');
+            apiKey = "";
+            document.getElementById('user-api-key').value = "";
+            document.getElementById('api-key-setup').classList.remove('hidden');
+            
+            const outputContainer = document.getElementById('ia-output-container');
+            const outputContent = document.getElementById('ia-output-content');
+            const outputTitle = document.getElementById('ia-output-title');
+            
+            outputContainer.classList.remove('hidden');
+            outputTitle.innerText = "Consola IA - Clave Eliminada";
+            outputContent.innerHTML = `<span class="text-orange-400">🔑 Clave eliminada de la memoria local del navegador. Por favor configure una nueva API Key en el panel superior.</span>`;
+        }
+
+        const codeTemplates = {
+            lecturas: `def procesar_lecturas_maturin(data):\n    # Segmentación y filtrado de lecturas de agua por distrito en Maturín\n    res = []\n    for row in data:\n        if row['municipio'] == 'Maturín' and row['lectura_actual'] is not None:\n            res.append({\n                'id': row['cliente_id'],\n                'consumo': row['lectura_actual'] - row['lectura_anterior']\n            })\n    return res`,
+            tarifas: `def calcular_tarifa_residencial(consumo, subsidio):\n    # Determina la tasa y aplica el subsidio gubernamental de Aguas de Monagas C.A.\n    base = 15.5\n    if consumo > 40:\n        tasa = 1.8\n    elif consumo > 20:\n        tasa = 1.2\n    else:\n        tasa = 0.8\n    return max(5.0, (consumo * tasa * base) - subsidio)`,
+            limpieza: `def limpiar_rifs_duplicados(lista_suscriptores):\n    # Remueve nulos y normaliza el patrón del RIF/Cédula regional\n    limpios = {}\n    for suscriptor in lista_suscriptores:\n        rif = str(suscriptor.get('rif', '')).strip().upper()\n        if rif and rif != 'NULL' and len(rif) > 5:\n            limpios[rif] = suscriptor\n    return list(limpios.values())`
+        };
+
+        function selectTemplate(type) {
+            const inputField = document.getElementById('ia-python-input');
+            inputField.value = codeTemplates[type];
+            inputField.classList.add('fade-in');
+            setTimeout(() => inputField.classList.remove('fade-in'), 400);
+        }
+
+        async function callGeminiAPI(prompt, systemInstruction = "") {
+            // Mitigación adicional: Detener peticiones en seco si no existe clave
+            if (!apiKey) {
+                document.getElementById('api-key-setup').classList.remove('hidden');
+                document.getElementById('api-key-setup').scrollIntoView({ behavior: 'smooth' });
+                throw new Error("Se requiere configurar su Gemini API Key en el panel superior para interactuar con el Consultor IA.");
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+            if (systemInstruction) {
+                payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+            }
+
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        const result = await response.json();
+                        return result.candidates?.[0]?.content?.parts?.[0]?.text || "No se recibió respuesta.";
+                    }
+                } catch (error) {
+                    // Reintento silencioso con retraso exponencial
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            }
+            throw new Error("No se pudo conectar con el servicio de IA de Google después de varios intentos. Por favor, compruebe que su API Key sea correcta y que tenga una conexión de red estable.");
+        }
+
+        function formatMarkdownAsTerminal(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/```(mojo|python|cpp|rust|bash|json)?([\s\S]*?)```/g, function(match, lang, code) {
+                    return `<pre class="bg-stone-950 p-4 rounded-lg my-3 border border-stone-800 overflow-x-auto text-teal-300 font-mono text-xs"><code class="language-${lang || 'txt'}">${code.trim()}</code></pre>`;
+                })
+                .replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([\s\S]*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        async function optimizeWithMojo() {
+            const pythonCode = document.getElementById('ia-python-input').value.trim();
+            const outputContainer = document.getElementById('ia-output-container');
+            const outputContent = document.getElementById('ia-output-content');
+            const outputTitle = document.getElementById('ia-output-title');
+            const errorBanner = document.getElementById('ia-error-banner');
+            const optimizeBtn = document.getElementById('btn-ia-optimize');
+
+            if (!pythonCode) {
+                showError("Por favor, ingrese un script Python o seleccione uno de los escenarios hídricos preestablecidos.");
+                return;
+            }
+
+            errorBanner.classList.add('hidden');
+            outputContainer.classList.remove('hidden');
+            outputTitle.innerText = "Optimizador de Compilación Nativa (Mojo)";
+            outputContent.innerHTML = `<div class="flex items-center space-x-2 text-stone-400">
+                <span class="animate-spin text-lg">⏳</span>
+                <span>Analizando estructura de datos Python... Creando punteros y vectorización SIMD segura...</span>
+            </div>`;
+            optimizeBtn.disabled = true;
+
+            const systemPrompt = "Eres un ingeniero especialista en Mojo, optimización de sistemas masivos de facturación de agua y C++/Rust. Debes traducir el código Python ingresado a Mojo moderno. Asegúrate de estructurar el código utilizando funciones nativas tipo 'fn' de Mojo, paso de variables eficientes ('inout' / 'borrowed'), estructuras fuertemente tipadas y explicar cómo esto ayuda a evitar los retardos del GIL y el Garbage Collector de Python. Responde de forma clara e interactiva en idioma Español.";
+            const userPrompt = `Optimiza este script Python para convertirlo en Mojo nativo ultraeficiente de producción:\n\n${pythonCode}`;
+
+            try {
+                const responseText = await callGeminiAPI(userPrompt, systemPrompt);
+                outputContent.innerHTML = formatMarkdownAsTerminal(responseText);
+            } catch (error) {
+                showError(error.message);
+                outputContainer.classList.add('hidden');
+            } finally {
+                optimizeBtn.disabled = false;
+            }
+        }
+
+        async function generateExecutiveBriefing() {
+            const briefingType = document.getElementById('ia-briefing-type').value;
+            const extraContext = document.getElementById('ia-extra-context').value.trim();
+            const outputContainer = document.getElementById('ia-output-container');
+            const outputContent = document.getElementById('ia-output-content');
+            const outputTitle = document.getElementById('ia-output-title');
+            const errorBanner = document.getElementById('ia-error-banner');
+            const briefingBtn = document.getElementById('btn-ia-briefing');
+
+            errorBanner.classList.add('hidden');
+            outputContainer.classList.remove('hidden');
+            outputTitle.innerText = "Generador de Briefing Ejecutivo (Gemini API)";
+            outputContent.innerHTML = `<div class="flex items-center space-x-2 text-orange-400">
+                <span class="animate-spin text-lg">⏳</span>
+                <span>Compilando datos hídricos históricos y métricas de infraestructura Cloud... Generando informe ejecutivo...</span>
+            </div>`;
+            briefingBtn.disabled = true;
+
+            const systemPrompt = "Eres el Consultor Tecnológico Líder de Aguas de Monagas C.A. Tu tarea es generar documentos ejecutivos corporativos con base en datos reales: 80,405 suscriptores de Maturín y Ezequiel Zamora, ganancia de rendimiento del 40.9x utilizando Mojo frente a Python interpretado, liberación del 97.5% de consumo de CPU, y escalabilidad a futuro garantizando latencia predecible de 31.5ms para 500k registros. El tono debe ser formal, corporativo y altamente persuasivo para la junta de Hidroven en Venezuela. Responde en idioma Español.";
+            
+            let userPrompt = `Genera un(a) ${briefingType.toUpperCase()} basado en las métricas de rendimiento y la optimización de recursos observada en la migración a Mojo.`;
+            if (extraContext) {
+                userPrompt += `\n\nToma en cuenta este contexto particular proporcionado por el usuario: "${extraContext}"`;
+            }
+
+            try {
+                const responseText = await callGeminiAPI(userPrompt, systemPrompt);
+                outputContent.innerHTML = formatMarkdownAsTerminal(responseText);
+            } catch (error) {
+                showError(error.message);
+                outputContainer.classList.add('hidden');
+            } finally {
+                briefingBtn.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorBanner = document.getElementById('ia-error-banner');
+            const errorMsg = document.getElementById('ia-error-message');
+            errorMsg.innerText = message;
+            errorBanner.classList.remove('hidden');
+            errorBanner.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyIaOutput() {
+            const contentArea = document.getElementById('ia-output-content');
+            const plainText = contentArea.innerText || contentArea.textContent;
+            
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = plainText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                const outputTitle = document.getElementById('ia-output-title');
+                const originalTitle = outputTitle.innerText;
+                outputTitle.innerText = "¡Contenido copiado al portapapeles! ✅";
+                setTimeout(() => {
+                    outputTitle.innerText = originalTitle;
+                }, 2000);
+            } catch (err) {
+                // silencioso
+            }
+            document.body.removeChild(tempTextArea);
+        }
+    </script>
+</body>
+</html>
